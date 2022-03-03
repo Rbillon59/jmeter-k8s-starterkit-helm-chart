@@ -1,0 +1,14 @@
+{{ if .Values.influxdb.persistence }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app: influxdb
+  name: influxdb-pvc
+spec:
+  accessModes:
+    - {{ .Values.influxdb.persistence.accessMode }}
+  resources:
+    requests:
+      storage: {{ .Values.influxdb.persistence.capacity }}
+{{ end }}

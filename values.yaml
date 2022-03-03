@@ -1,0 +1,180 @@
+# Namespace
+namespace: jmeter
+
+# Segregate framework on a specific node pool ? (it's a good practice to not use tested application node resources for load testing tools)
+segregate:
+  enabled: false
+  nodeSelector:
+    # Specific annotations for each cloud providers
+    annotationKey: k8s.scaleway.com/pool-name
+    annotationValue: injectors
+  # Used only for the demo app to be in another node pool
+  nodeSelectorDemo:
+    annotationKey: k8s.scaleway.com/pool-name
+    annotationValue: demo
+
+
+# CronJob used to clean old JMeter jobs (to free completely the resources, even kubelet and etcd ones)
+cleaner:
+  enabled: true
+  schedule: "*/1 * * * *"
+  successfulJobsHistoryLimit: 1
+
+# Grafana instance with built-in dashboards and datasources
+grafana:
+  # Deloyement options
+  enabled: true
+  useBuiltInDashboard: true
+  useBuiltInDatasource: true
+  replicas: 1
+  image: docker.io/grafana/grafana:7.3.3
+  resources: 
+    requests:
+      memory: "256Mi"
+      cpu: "128m"
+    limits:
+      memory: "512Mi"
+      cpu: "512m"
+  
+  # Storage options
+  persistence:
+    enabled: true
+    capacity: 1Gi
+    accessMode: ReadWriteOnce
+
+  adminUsername: "admin"
+  adminPassword: "XhXUdmQ576H6e7"
+    
+  # Service options
+  service:
+    enabled: true
+    port: 4430
+    type: LoadBalancer
+
+# Infludb database used to store JMeter and telegraf data
+influxdb:
+  enabled: true
+  image: docker.io/influxdb:1.8
+  replicas: 1
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "128m"
+    limits:
+      memory: "256Mi"
+      cpu: "512m"
+  persistence:
+    enabled: true
+    capacity: 5G
+    accessMode: ReadWriteOnce
+
+  adminUser: "admin"
+  adminPassword: "password"
+  dbName: "telegraf"
+  host: "influxdb"
+  enableAuth: "false"
+  readOnlyUser: "readonly"
+  user: "user"
+  userPassword: "password"
+
+  service:
+    enabled: true
+    port: 8086
+
+
+# JMeter jobs used as load injectors and master
+jmeter:
+  # Image tag is JMeter's version
+  image: rbillon59/jmeter-k8s-base:5.4.1
+  enableMonitoring: true
+  master:
+    resources:
+      requests:
+        memory: "512Mi"
+        cpu: "128m"
+      limits:
+        memory: "2048Mi"
+        cpu: "2048m"
+
+    persistence:
+      enabled: true
+      capacity: 5Gi
+      accessMode: ReadWriteOnce
+  
+  slave:
+    jobTimeToLiveAfterFinished: 60
+    service:
+      ports:
+        jmeter: 1099
+        rmi: 50000
+        stopTest: 4445
+    resources:
+      requests:
+        memory: "1024Mi"
+        cpu: "1024m"
+      limits:
+        memory: "1024Mi"
+        cpu: "1024m"
+    
+
+
+# Demo application used inside the default JMeter scenario
+demo:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 10
+  targetCpuUsage: 30
+  resources:
+    requests:
+      memory: "64Mi"
+      cpu: "128m"
+    limits:
+      memory: "1024Mi"
+      cpu: "1024m"
+  service:
+    port: 8080
+
+# StatefulSet used to monitor the nodes
+telegraf:
+  enabled: true
+  image: docker.io/telegraf:1.5.2
+  resources: 
+    requests:
+      memory: "256Mi"
+      cpu: "256m"
+    limits:
+      memory: "256Mi"
+      cpu: "256m"
+
+# Mock deployed in the cluster
+wiremock:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 10
+  targetCpuUsage: 30
+  mappings:
+    example: true
+    custom: 
+      static.json: |-
+        {
+        "request": {
+          "url": "/static"
+          },
+            "response": {
+              "status": 200,
+              "fixedDelayMilliseconds": 50,
+              "jsonBody": {"message":"hello world"}
+            }
+          }
+        }
+  image: rbillon59/wiremock-loadtest:latest
+  monitoring: true
+  resources:
+    requests:
+      memory: "1024Mi"
+      cpu: "1024m"
+    limits:
+      memory: "1024Mi"
+      cpu: "1024m"
+  service:
+    port: 8080

@@ -1,0 +1,43 @@
+{{ if .Values.influxdb.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: influxdb
+  name: influxdb
+spec:
+  replicas: {{ .Values.influxdb.replicas }}
+  selector:
+    matchLabels:
+      app: influxdb
+  template:
+    metadata:
+      labels:
+        app: influxdb
+    spec:
+      {{ include "segregate" . | nindent 6 }}
+      containers:
+        - envFrom:
+            - secretRef:
+                name: influxdb-creds
+          image: {{ .Values.influxdb.image }}
+          name: influxdb
+          resources:
+            requests:
+              memory: {{ .Values.influxdb.resources.requests.memory }}
+              cpu: {{ .Values.influxdb.resources.requests.cpu }}
+            limits:
+              memory: {{ .Values.influxdb.resources.limits.memory }}
+              cpu: {{ .Values.influxdb.resources.limits.cpu }}
+          {{ if .Values.influxdb.persistence }}
+          volumeMounts:
+            - mountPath: /var/lib/influxdb
+              name: var-lib-influxdb
+          {{ end }}
+      {{ if .Values.influxdb.persistence }}
+      volumes:
+        - name: var-lib-influxdb
+          persistentVolumeClaim:
+            claimName: influxdb-pvc
+      {{ end }}
+{{ end }}

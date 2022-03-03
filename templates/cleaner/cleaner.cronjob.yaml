@@ -1,0 +1,26 @@
+{{ if .Values.cleaner.enabled }}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: jobs-cleanup
+spec:
+  schedule: {{ .Values.cleaner.schedule | quote }}
+  successfulJobsHistoryLimit: {{ .Values.cleaner.successfulJobsHistoryLimit }}
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: cleaner
+          containers:
+          - name: kubectl-container
+            image: bitnami/kubectl:latest
+            command: ["sh", "/tmp/clean.sh"]
+            volumeMounts:
+            - name: cleaner-script
+              mountPath: /tmp/
+          restartPolicy: Never
+          volumes:
+          - name: cleaner-script
+            configMap:
+              name: cleaner-script
+{{ end }}

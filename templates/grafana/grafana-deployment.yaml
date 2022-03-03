@@ -1,0 +1,75 @@
+{{ if .Values.grafana.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: grafana
+  name: grafana
+spec:
+  replicas: {{ .Values.grafana.replicas }}
+  selector:
+    matchLabels:
+      app: grafana
+  template:
+    metadata:
+      labels:
+        app: grafana
+    spec:
+      {{ include "segregate" . | nindent 6 }}
+      containers:
+      - envFrom:
+        - secretRef:
+            name: grafana-creds
+        image: {{ .Values.grafana.image }}
+        name: grafana
+        resources:
+          requests:
+            memory: {{ .Values.grafana.resources.requests.memory }}
+            cpu: {{ .Values.grafana.resources.requests.cpu }}
+          limits:
+            memory: {{ .Values.grafana.resources.limits.memory }}
+            cpu: {{ .Values.grafana.resources.limits.cpu }}
+        {{ if .Values.grafana.persistence }}
+        volumeMounts:
+          - name: data-dir
+            mountPath: /var/lib/grafana/
+        {{ end }}
+        {{ if .Values.grafana.useBuiltInDashboards }}
+          - name: grafana-dashboards
+            mountPath: /var/lib/grafana/dashboards
+          - name: influxdb-dashboard-provisioning
+            mountPath: /etc/grafana/provisioning/dashboards
+        {{ end }}
+        {{ if .Values.grafana.useBuiltInDatasource }}
+          - name: influxdb-datasource-provisioning
+            mountPath: /etc/grafana/provisioning/datasources
+        {{ end }}
+      securityContext:
+        fsGroup: 472
+      volumes:
+        {{ if .Values.grafana.persistence }}
+        - name: data-dir
+          persistentVolumeClaim:
+            claimName: graf-data-dir-pvc
+        {{ end }}
+        {{ if .Values.grafana.useBuiltInDashboards }}
+        - name: grafana-dashboards
+          configMap:
+            name: grafana-dashboards
+            defaultMode: 420
+        - name: telegraf-dashboard
+          configMap:
+            name: telegraf-dashboard
+            defaultMode: 420
+        - name: influxdb-dashboard-provisioning
+          configMap:
+            name: influxdb-dashboard-provisioning
+            defaultMode: 420
+        {{ end }}
+        {{ if .Values.grafana.useBuiltInDatasource }}
+        - name: influxdb-datasource-provisioning
+          configMap:
+            name: influxdb-datasource-provisioning
+            defaultMode: 420
+        {{ end }}
+{{ end }}

@@ -1,0 +1,45 @@
+{{ if .Values.demo.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: target
+  labels:
+    type: target
+spec:
+  replicas: {{ .Values.demo.replicas }}
+  selector:
+    matchLabels:
+      type: target
+  template:
+    metadata:
+      labels:
+        type: target
+    spec:
+      {{ include "segregate" . | nindent 6 }}
+      containers:
+      - name: target
+        image: japronto/japronto
+        command: ["japronto", "--script", "/scripts/async.py"]
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+        volumeMounts:
+        - name: target-async
+          mountPath: /scripts
+        resources:
+          requests:
+            memory: {{ .Values.demo.resources.requests.memory }}
+            cpu: {{ .Values.demo.resources.requests.cpu }}
+          limits:
+            memory: {{ .Values.demo.resources.limits.memory }}
+            cpu: {{ .Values.demo.resources.limits.cpu }}
+        livenessProbe:
+          exec:
+            command:
+            - cat
+            - /bin/cat
+      volumes:
+        - name: target-async
+          configMap:
+            name: target-async
+{{ end }}

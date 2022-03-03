@@ -1,0 +1,14 @@
+{{ if .Values.grafana.enabled }}
+{{ if .Values.grafana.persistence }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: graf-data-dir-pvc
+spec:
+  accessModes:
+    - {{ .Values.grafana.persistence.accessMode }}
+  resources:
+    requests:
+      storage: {{ .Values.grafana.persistence.capacity }}
+{{ end }}
+{{ end }}

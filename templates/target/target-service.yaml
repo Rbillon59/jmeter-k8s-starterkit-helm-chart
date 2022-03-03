@@ -1,0 +1,15 @@
+{{ if .Values.demo.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: target-svc
+  labels:
+    type: target
+spec:
+  clusterIP: None
+  ports:
+    - port: {{ .Values.demo.service.port }}
+      targetPort: 8080
+  selector:
+    type: target
+{{ end }}

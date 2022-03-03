@@ -1,0 +1,16 @@
+{{ if .Values.demo.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: target-async
+data:
+  async.py: |-
+    import asyncio
+    from japronto import Application
+    async def asynchronous(request):
+        return request.Response(text='')
+    app = Application()
+    r = app.router
+    r.add_route('/async', asynchronous)
+    app.run()
+{{ end }}

@@ -1,0 +1,15 @@
+{{ if .Values.wiremock.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: wiremock-svc
+  labels:
+    type: mock
+spec:
+  clusterIP: None
+  ports:
+    - port: {{ .Values.wiremock.service.port }}
+      targetPort: 8080
+  selector:
+    type: mock
+{{ end }}

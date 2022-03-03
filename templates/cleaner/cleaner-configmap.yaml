@@ -1,0 +1,18 @@
+{{ if .Values.cleaner.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cleaner-script
+  labels:
+    k8s-app: cleaner
+data:
+  clean.sh: |+
+    #!/bin/sh
+    set -x 
+    master_pod=$(kubectl get pod -o name --selector jmeter_mode=master)
+    status=$(kubectl describe ${master_pod} | grep Reason: | awk -F " " '{print $2}')
+    if [ "${status}" = "Completed" ]; then
+      kubectl delete jobs --selector jmeter_mode=slave 
+      kubectl delete jobs --selector jmeter_mode=master
+    fi
+{{ end }}

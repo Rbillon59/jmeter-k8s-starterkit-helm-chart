@@ -1,0 +1,41 @@
+{{ if .Values.wiremock.enabled }}
+{{ if .Values.wiremock.mappings.example }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: wiremock-mapping
+data:
+  static.json: |-
+    {
+    "request": {
+      "method": "GET",
+      "url": "/static"
+      },
+        "response": {
+          "status": 200,
+          "fixedDelayMilliseconds": 50,
+          "jsonBody": {
+            "data": [{
+              "type": "product",
+              "id": "1",
+              "attributes": {
+                "productName": "Raspberry PI",
+                "productDescription": "Best product ever",
+                "price": 42,
+                "stock": 500
+              }
+            }]
+          }
+        }
+      }
+{{ end }}
+{{ if not .Values.wiremock.mappings.example }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: wiremock-mapping
+data: 
+  {{ toYaml .Values.wiremock.mappings.custom }}
+{{ end }}
+{{ end }}
