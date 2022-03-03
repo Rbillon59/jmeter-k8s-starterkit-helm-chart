@@ -3,12 +3,12 @@ entries:
   jmeter-k8s-starterkit:
   - apiVersion: v2
     appVersion: 0.0.1
-    created: "2022-03-03T19:00:58.997466297+01:00"
+    created: "2022-03-03T19:05:10.148278661+01:00"
     description: Load testing framework based on github.com/Rbillon59/jmeter-k8s-starterkit
     digest: 806e1c0dc1e3c470cadd8fd8c62c4ba8c76e37e027206120d2b3f80d3428caad
     name: jmeter-k8s-starterkit
     type: application
     urls:
-    - jmeter-k8s-starterkit-0.0.1.tgz
+    - https://rbillon59.github.io/jmeter-k8s-starterkit-helm-chart/jmeter-k8s-starterkit-0.0.1.tgz
     version: 0.0.1
-generated: "2022-03-03T19:00:58.9902078+01:00"
+generated: "2022-03-03T19:05:10.140259233+01:00"
