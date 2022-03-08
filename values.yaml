@@ -17,7 +17,7 @@ segregate:
 # CronJob used to clean old JMeter jobs (to free completely the resources, even kubelet and etcd ones)
 cleaner:
   enabled: true
-  schedule: "*/1 * * * *"
+  schedule: "*/5 * * * *"
   successfulJobsHistoryLimit: 1
 
 # Grafana instance with built-in dashboards and datasources
