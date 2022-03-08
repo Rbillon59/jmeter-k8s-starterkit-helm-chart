@@ -1,0 +1,14 @@
+apiVersion: v1
+entries:
+  jmeter-k8s-starterkit:
+  - apiVersion: v2
+    appVersion: 0.0.2
+    created: "2022-03-08T13:43:10.611329969Z"
+    description: Load testing framework based on github.com/Rbillon59/jmeter-k8s-starterkit
+    digest: 00958ae77cb29c3d49cdb4010013d1e9ce69a7f5662f6a077df8d6bb4b193418
+    name: jmeter-k8s-starterkit
+    type: application
+    urls:
+    - https://github.com/Rbillon59/jmeter-k8s-starterkit-helm-chart/releases/download/jmeter-k8s-starterkit-0.0.2/jmeter-k8s-starterkit-0.0.2.tgz
+    version: 0.0.2
+generated: "2022-03-08T13:43:10.34629855Z"
