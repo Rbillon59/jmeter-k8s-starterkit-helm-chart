@@ -7,6 +7,15 @@ If you enjoy and want to support my work :
 
 # Helm repository for JMeter k8s starterkit 
 
+ | This helm project is at an very early stage, feel free to test it and open any issue for any feedbacks. Thanks you
+
+## Installation
+
+```shell
+helm repo add jmeter-k8s-starterkit-helm-charts https://rbillon59.github.io/jmeter-k8s-starterkit-helm-chart/
+helm install jmeter-k8s-starterkit-helm-charts/jmeter-k8s-starterkit --generate-name
+```
+
 ## Parameters :
 
 Feel free to update the `values.yaml` file with the needed parameters.
